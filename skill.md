@@ -23,7 +23,7 @@ install.packages("httpuv")
 
 ## Updating the data
 
-The app reads `data/risk_data.rds`, not the Excel file. After editing the Excel file, regenerate it:
+The app reads `data/app_data.rds`, not the Excel file. After editing the Excel file or `data/pest_stage_weights.csv`, regenerate it:
 
 ```bash
 Rscript --vanilla process_data.R
@@ -31,7 +31,7 @@ Rscript --vanilla process_data.R
 
 ## Exporting the App
 
-We have provided a helper script `export_shinylive.R` to automate the export process. This script stages only `app.R` and `data/risk_data.rds` (the app no longer reads the Excel file at runtime) and creates a `docs/` directory containing the static web assets.
+We have provided a helper script `export_shinylive.R` to automate the export process. This script stages only `app.R` and `data/app_data.rds` (the app no longer reads the Excel file at runtime) and creates a `docs/` directory containing the static web assets.
 
 To run the export script, we recommend using the provided PowerShell script which automatically detects the latest R version:
 

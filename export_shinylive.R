@@ -3,7 +3,7 @@
 # Usage (from the project root):
 #   Rscript --vanilla export_shinylive.R
 #
-# Only app.R and data/risk_data.rds are bundled; everything else in the
+# Only app.R and data/app_data.rds are bundled; everything else in the
 # project (renv/, the Excel source, manifest.json, ...) is left out so the
 # browser download stays small.
 
@@ -17,8 +17,8 @@ for (pkg in c("shinylive", "httpuv")) {
 output_dir <- "docs" # GitHub Pages can serve from /docs on the main branch
 
 # Rebuild the data file if it is missing
-if (!file.exists("data/risk_data.rds")) {
-  message("data/risk_data.rds not found, running process_data.R ...")
+if (!file.exists("data/app_data.rds")) {
+  message("data/app_data.rds not found, running process_data.R ...")
   source("process_data.R", encoding = "UTF-8")
 }
 
@@ -27,7 +27,7 @@ stage_dir <- file.path(tempdir(), "rice_pest_app")
 unlink(stage_dir, recursive = TRUE)
 dir.create(file.path(stage_dir, "data"), recursive = TRUE)
 file.copy("app.R", stage_dir)
-file.copy("data/risk_data.rds", file.path(stage_dir, "data"))
+file.copy("data/app_data.rds", file.path(stage_dir, "data"))
 
 if (dir.exists(output_dir)) {
   message("Removing existing ", output_dir, " directory...")
