@@ -1,36 +1,44 @@
-# Script to export Shiny app to Shinylive
+# Export the Shiny app to a static Shinylive (webR) site.
+#
+# Usage (from the project root):
+#   Rscript --vanilla export_shinylive.R
+#
+# Only app.R and data/risk_data.rds are bundled; everything else in the
+# project (renv/, the Excel source, manifest.json, ...) is left out so the
+# browser download stays small.
 
-# Check for required packages and install if missing
-if (!requireNamespace("shinylive", quietly = TRUE)) {
-    message("Installing 'shinylive' package...")
-    install.packages("shinylive", repos = "https://cloud.r-project.org")
+for (pkg in c("shinylive", "httpuv")) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    message("Installing '", pkg, "' package...")
+    install.packages(pkg, repos = "https://cloud.r-project.org")
+  }
 }
-if (!requireNamespace("httpuv", quietly = TRUE)) {
-    message("Installing 'httpuv' package...")
-    install.packages("httpuv", repos = "https://cloud.r-project.org")
+
+output_dir <- "docs" # GitHub Pages can serve from /docs on the main branch
+
+# Rebuild the data file if it is missing
+if (!file.exists("data/risk_data.rds")) {
+  message("data/risk_data.rds not found, running process_data.R ...")
+  source("process_data.R", encoding = "UTF-8")
 }
 
-# Define input and output directories
-app_dir <- "."
-output_dir <- "site"
+# Stage a minimal copy of the app
+stage_dir <- file.path(tempdir(), "rice_pest_app")
+unlink(stage_dir, recursive = TRUE)
+dir.create(file.path(stage_dir, "data"), recursive = TRUE)
+file.copy("app.R", stage_dir)
+file.copy("data/risk_data.rds", file.path(stage_dir, "data"))
 
-# Clean output directory if it exists to avoid conflicts
 if (dir.exists(output_dir)) {
-    message(paste("Removing existing", output_dir, "directory..."))
-    unlink(output_dir, recursive = TRUE)
+  message("Removing existing ", output_dir, " directory...")
+  unlink(output_dir, recursive = TRUE)
 }
 
-# Export the application
-message(paste("Exporting Shinylive app from", app_dir, "to", output_dir, "..."))
-tryCatch(
-    {
-        shinylive::export(app_dir, output_dir)
-        message("Export successfully completed!")
-        message("To preview the app, run the following command in R:")
-        message(paste0("httpuv::runStaticServer('", output_dir, "')"))
-    },
-    error = function(e) {
-        message("Error during export:")
-        message(e$message)
-    }
-)
+message("Exporting Shinylive app to ", output_dir, " ...")
+shinylive::export(stage_dir, output_dir)
+
+# Tell GitHub Pages not to run Jekyll on the output
+file.create(file.path(output_dir, ".nojekyll"))
+
+message("Done. Preview with:")
+message("  httpuv::runStaticServer('", output_dir, "')")

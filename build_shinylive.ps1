@@ -25,7 +25,7 @@ if (-not (Test-Path $r_bin)) {
 }
 
 Write-Host "Using R version found at: $r_bin"
-& $r_bin "export_shinylive.R"
+& $r_bin --vanilla "export_shinylive.R"
 if ($LASTEXITCODE -eq 0) {
     Write-Host "Export process completed successfully." -ForegroundColor Green
 } else {

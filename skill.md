@@ -21,9 +21,17 @@ install.packages("shinylive")
 install.packages("httpuv")
 ```
 
+## Updating the data
+
+The app reads `data/risk_data.rds`, not the Excel file. After editing the Excel file, regenerate it:
+
+```bash
+Rscript --vanilla process_data.R
+```
+
 ## Exporting the App
 
-We have provided a helper script `export_shinylive.R` to automate the export process. This script creates a `site/` directory containing the static web assets.
+We have provided a helper script `export_shinylive.R` to automate the export process. This script stages only `app.R` and `data/risk_data.rds` (the app no longer reads the Excel file at runtime) and creates a `docs/` directory containing the static web assets.
 
 To run the export script, we recommend using the provided PowerShell script which automatically detects the latest R version:
 
@@ -34,7 +42,7 @@ To run the export script, we recommend using the provided PowerShell script whic
 If you prefer to run it manually (and have a modern R version in your PATH):
 
 ```bash
-Rscript export_shinylive.R
+Rscript --vanilla export_shinylive.R
 ```
 
 Alternatively, you can run it from within an R session:
@@ -45,25 +53,25 @@ source("export_shinylive.R")
 
 ## Previewing Locally
 
-After exporting, the static application is located in the `site/` folder. To verify that it works correctly, you can serve it locally using `httpuv`.
+After exporting, the static application is located in the `docs/` folder. To verify that it works correctly, you can serve it locally using `httpuv`.
 
 Run this in your R console:
 
 ```r
-httpuv::runStaticServer("site")
+httpuv::runStaticServer("docs")
 ```
 
 This will start a local web server and open the app in your browser.
 
 ## Deployment to GitHub Pages
 
-The `site/` folder is configured to be easily deployable to GitHub Pages.
+The `docs/` folder is configured to be easily deployable to GitHub Pages.
 
-1. Push your changes (including the `site/` folder) to GitHub.
+1. Push your changes (including the `docs/` folder) to GitHub.
 2. Go to your repository on GitHub.
 3. Navigate to **Settings** > **Pages**.
 4. Under **Build and deployment** > **Source**, select **Deploy from a branch**.
-5. Under **Branch**, select `main` (or your current branch) and choose the `/site` folder.
+5. Under **Branch**, select `main` (or your current branch) and choose the `/docs` folder.
 6. Click **Save**.
 
 Your app will be live at the provided URL shortly.

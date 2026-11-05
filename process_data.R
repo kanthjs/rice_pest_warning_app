@@ -69,6 +69,12 @@ df <- df %>%
 risk_data <- df %>%
     pivot_longer(cols = 4:15, names_to = "month", values_to = "risk_val")
 
+# Keep only the columns the app needs, as a plain data.frame so the RDS
+# loads in webR without extra packages
+risk_data <- risk_data %>%
+    select(pest, `จังหวัด`, severity_level, month, risk_val) %>%
+    as.data.frame()
+
 message("Saving processed data to RDS...")
-saveRDS(risk_data, "data/processed_risk_data.rds")
+saveRDS(risk_data, "data/risk_data.rds")
 message("Done.")
